@@ -7,7 +7,7 @@ describe('RemoteConnector', function() {
   before(function setupServer(done) {
     ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.serverApp,
       datasource: helper.createMemoryDataSource()
     });
@@ -17,7 +17,7 @@ describe('RemoteConnector', function() {
   before(function setupRemoteClient(done) {
     ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.remoteApp,
       datasource: helper.createRemoteDataSource(ctx.serverApp)
     });
@@ -74,7 +74,7 @@ describe('Custom Path', function() {
   before(function setupServer(done) {
     ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.serverApp,
       datasource: helper.createMemoryDataSource(),
       options: {
@@ -87,7 +87,7 @@ describe('Custom Path', function() {
   before(function setupRemoteClient(done) {
     ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.remoteApp,
       datasource: helper.createRemoteDataSource(ctx.serverApp),
       options: {

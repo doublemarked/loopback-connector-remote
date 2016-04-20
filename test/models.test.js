@@ -7,7 +7,7 @@ describe('Model tests', function() {
 
   beforeEach(function() {
     User = helper.createModel({
-      parent: 'user',
+      name: 'user',
       app: helper.createRestAppAndListen(),
       datasource: helper.createMemoryDataSource(),
       properties: helper.getUserProperties()

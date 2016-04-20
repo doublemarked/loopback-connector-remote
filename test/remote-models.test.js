@@ -8,21 +8,22 @@ describe('Remote model tests', function() {
   beforeEach(function(done) {
     ctx.serverApp = helper.createRestAppAndListen();
     ctx.ServerModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.serverApp,
       datasource: helper.createMemoryDataSource(),
-      properties: helper.userProperties
+      properties: helper.getUserProperties()
     });
+
     ctx.serverApp.locals.handler.on('listening', function() { done(); });
   });
 
   beforeEach(function setupRemoteClient(done) {
     ctx.remoteApp = helper.createRestAppAndListen();
     ctx.RemoteModel = helper.createModel({
-      parent: 'TestModel',
+      name: 'TestModel',
       app: ctx.remoteApp,
       datasource: helper.createRemoteDataSource(ctx.serverApp),
-      properties: helper.userProperties
+      properties: helper.getUserProperties()
     });
     ctx.remoteApp.locals.handler.on('listening', function() { done(); });
   });

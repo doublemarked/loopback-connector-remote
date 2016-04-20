@@ -35,7 +35,7 @@ function createRemoteDataSource(remoteApp) {
  * app.
  */
 function createModel(options) {
-  var Model = loopback.PersistedModel.extend(options.parent, options.properties,
+  var Model = loopback.PersistedModel.extend(options.name, options.properties,
       options.options);
   if (options.app) options.app.model(Model);
   if (options.datasource) Model.attachTo(options.datasource);
