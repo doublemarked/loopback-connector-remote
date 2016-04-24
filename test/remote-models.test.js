@@ -7,32 +7,63 @@ describe('Remote model tests', function() {
 
   beforeEach(function(done) {
     ctx.serverApp = helper.createRestAppAndListen();
+
+    var memoryDs = helper.createMemoryDataSource();
     ctx.ServerModel = helper.createModel({
       name: 'TestModel',
       app: ctx.serverApp,
-      datasource: helper.createMemoryDataSource(),
+      datasource: memoryDs,
       properties: helper.getUserProperties()
     });
 
-    ctx.serverApp.locals.handler.on('listening', function() { done(); });
+    ctx.ServerRelatedModel = helper.createModel({
+      name: 'RelatedModel',
+      app: ctx.serverApp,
+      datasource: memoryDs,
+      properties: { name: 'String' },
+      options: {
+        relations: {
+          related: { type: 'hasMany', model: ctx.ServerModel }
+        }
+      }
+    });
+
+    ctx.serverApp.locals.handler.on('listening', done);
   });
 
   beforeEach(function setupRemoteClient(done) {
     ctx.remoteApp = helper.createRestAppAndListen();
+    var remoteDs = helper.createRemoteDataSource(ctx.serverApp);
+
     ctx.RemoteModel = helper.createModel({
       name: 'TestModel',
       app: ctx.remoteApp,
-      datasource: helper.createRemoteDataSource(ctx.serverApp),
+      datasource: remoteDs,
       properties: helper.getUserProperties()
     });
-    ctx.remoteApp.locals.handler.on('listening', function() { done(); });
+
+    ctx.RemoteRelatedModel = helper.createModel({
+      name: 'RelatedModel',
+      app: ctx.remoteApp,
+      datasource: remoteDs,
+      properties: { name: 'String' },
+      options: {
+        relations: {
+          related: { type: 'hasMany', model: ctx.RemoteModel }
+        }
+      }
+    });
+
+    ctx.remoteApp.locals.handler.on('listening', done);
   });
 
   afterEach(function() {
     ctx.serverApp.locals.handler.close();
     ctx.remoteApp.locals.handler.close();
     ctx.ServerModel = null;
+    ctx.ServerRelatedModel = null;
     ctx.RemoteModel = null;
+    ctx.RemoteRelatedModel = null;
   });
 
   describe('Model.create([data], [callback])', function() {
@@ -123,6 +154,29 @@ describe('Remote model tests', function() {
         });
       });
     });
+
+    it('should support the include filter', function (done) {
+      ctx.ServerRelatedModel.create({}, function (err, relatedInstance) {
+        if (err) return done(err);
+        relatedInstance.related.create({ name: 'INCLUDE-TEST' }, function (err, modelInstance) {
+          if (err) return done(err);
+          ctx.RemoteRelatedModel.findById(relatedInstance.id, { include: 'related' }, function (err, remoteInstance) {
+
+            if (err) return done(err);
+            assert(remoteInstance instanceof ctx.RemoteRelatedModel);
+            assert.equal(remoteInstance.id, relatedInstance.id);
+
+            var related = remoteInstance.related();
+            assert(Array.isArray(related), 'Expected array of related models, got: '+related);
+            assert.equal(related[0].id, modelInstance.id);
+            assert.equal(related[0].name, 'INCLUDE-TEST');
+
+            done();
+          });
+        });
+      });
+    });
+
   });
 
   describe('Model.count([query], callback)', function() {
