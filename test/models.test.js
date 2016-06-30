@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2016. All Rights Reserved.
+// Node module: loopback-connector-remote
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
 var assert = require('assert');
 var helper = require('./helper');
 var TaskEmitter = require('strong-task-emitter');
@@ -91,15 +96,6 @@ describe('Model tests', function() {
         assert(user.errors.age, 'model should have age error');
         done();
       });
-    });
-  });
-
-  describe('Model methods', function() {
-    it('should support promises', function(done) {
-      assert(User.create() instanceof Promise);
-      assert(User.find() instanceof Promise);
-      assert(User.findById(99) instanceof Promise);
-      done();
     });
   });
 

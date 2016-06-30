@@ -1,3 +1,8 @@
+// Copyright IBM Corp. 2014,2016. All Rights Reserved.
+// Node module: loopback-connector-remote
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
 /*global module:false*/
 module.exports = function(grunt) {
   // Project configuration.
@@ -23,6 +28,19 @@ module.exports = function(grunt) {
       }
     },
     mochaTest: {
+      'integration': {
+        src: 'test/integration/*.js',
+        options: {
+          reporter: 'dot'
+        }
+      },
+      'integration-xml': {
+        src: 'test/integration/*.js',
+        options: {
+          reporter: 'xunit',
+          captureFile: 'xintegration.xml'
+        }
+      },
       'unit': {
         src: 'test/*.test.js',
         options: {
@@ -44,8 +62,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task.
-  grunt.registerTask('default', ['test']);
+  grunt.registerTask('default', ['unit', 'integration']);
 
-  grunt.registerTask('test', [
-    process.env.JENKINS_HOME ? 'mochaTest:unit-xml' : 'mochaTest:unit']);
+  if (process.env.JENKINS_HOME) {
+    grunt.registerTask('unit', ['mochaTest:unit-xml']);
+    grunt.registerTask('integration', ['mochaTest:integration-xml']);
+  } else {
+    grunt.registerTask('unit', ['mochaTest:unit']);
+    grunt.registerTask('integration', ['mochaTest:integration']);
+  }
 };
